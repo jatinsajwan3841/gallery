@@ -1,0 +1,47 @@
+.gallery-holder {
+    position: relative;
+}
+
+.gallery-options {
+    position: absolute;
+    right: -82px;
+    top: 0px;
+}
+
+.gallery-images {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    border-radius: 4px;
+}
+
+.gallery-images img {
+    border-radius: 10px;
+}
+
+.gallery-number {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 149px;
+    width: 149px;
+    right: 0px;
+    top: 0;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    border-radius: 10px;
+}
+
+.fixed-add {
+    position: fixed;
+    display: flex;
+    bottom: 30px;
+    right: 30px;
+}
+
+.empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
