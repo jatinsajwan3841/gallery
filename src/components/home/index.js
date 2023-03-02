@@ -10,6 +10,7 @@ import Box from "@mui/material/Box";
 import Fab from "@mui/material/Fab";
 import AddIcon from "@mui/icons-material/Add";
 import GalleryView from "../galleryView";
+import { useNavigate } from "react-router-dom";
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -45,6 +46,7 @@ function a11yProps(index) {
 }
 
 const Home = () => {
+    const navigate = useNavigate();
     const theme = useTheme();
     const [value, setValue] = React.useState(0);
 
@@ -55,6 +57,13 @@ const Home = () => {
     const handleChangeIndex = (index) => {
         setValue(index);
     };
+
+    React.useEffect(() => {
+        const token = localStorage.getItem("token");
+        if (!token) {
+            navigate("/login");
+        }
+    }, []);
 
     return (
         <Box sx={{ bgcolor: "background.paper" }}>

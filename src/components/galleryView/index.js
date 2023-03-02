@@ -11,18 +11,47 @@ const GalleryView = ({ tab }) => {
     const [gallery, setGallery] = React.useState([]);
 
     const getImages = async () => {
-        const images = await axios.get("https://picsum.photos/v2/list");
+        const config = {
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: process.env.REACT_APP_APIKey,
+            },
+        };
+        const images = await axios.get(
+            "https://api.pexels.com/v1/curated?per_page=30",
+            config
+        );
+        console.log(images);
         const data = [];
-        data.push(images.data.slice(0, 10));
-        data.push(images.data.slice(10, 20));
-        data.push(images.data.slice(20, 30));
+        data.push(images.data.photos.slice(0, 10));
+        data.push(images.data.photos.slice(10, 20));
+        data.push(images.data.photos.slice(20, 30));
+        setGallery(data);
+    };
+
+    const getVidoes = async () => {
+        const config = {
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: process.env.REACT_APP_APIKey,
+            },
+        };
+        const videos = await axios.get(
+            "https://api.pexels.com/videos/popular?per_page=30",
+            config
+        );
+        console.log(videos);
+        const data = [];
+        data.push(videos.data.videos.slice(0, 10));
+        data.push(videos.data.videos.slice(10, 20));
+        data.push(videos.data.videos.slice(20, 30));
         setGallery(data);
     };
     React.useEffect(() => {
         if (tab === "Image") {
             getImages();
         } else if (tab === "Video") {
-            getImages();
+            getVidoes();
         }
     }, []);
     return (
@@ -51,14 +80,40 @@ const GalleryView = ({ tab }) => {
                                                             className="gallery-images"
                                                             key={ind}
                                                         >
-                                                            <img
-                                                                src={
-                                                                    val.download_url
-                                                                }
-                                                                width="149"
-                                                                height="149"
-                                                                loading="lazy"
-                                                            />
+                                                            {tab === "Image" ? (
+                                                                <img
+                                                                    src={
+                                                                        val.src
+                                                                            .medium
+                                                                    }
+                                                                    width="149"
+                                                                    height="149"
+                                                                    loading="lazy"
+                                                                    style={{
+                                                                        objectFit:
+                                                                            "cover",
+                                                                    }}
+                                                                />
+                                                            ) : (
+                                                                <video
+                                                                    width="149"
+                                                                    height="149"
+                                                                    controls
+                                                                    style={{
+                                                                        objectFit:
+                                                                            "cover",
+                                                                    }}
+                                                                >
+                                                                    <source
+                                                                        src={
+                                                                            val
+                                                                                .video_files[1]
+                                                                                .link
+                                                                        }
+                                                                        type="video/mp4"
+                                                                    />
+                                                                </video>
+                                                            )}
                                                             {value.length > 4 &&
                                                                 ind > 2 && (
                                                                     <span className="gallery-number">
@@ -88,7 +143,9 @@ const GalleryView = ({ tab }) => {
                             </Grid>
                         ))
                     ) : (
-                        <div className="empty">No {tab} found</div>
+                        <Grid item>
+                            <span className="empty">No {tab} found</span>
+                        </Grid>
                     )}
                 </Grid>
             </Grid>

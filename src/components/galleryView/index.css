@@ -39,9 +39,3 @@
     bottom: 30px;
     right: 30px;
 }
-
-.empty {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}

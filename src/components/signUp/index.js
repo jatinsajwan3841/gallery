@@ -111,12 +111,17 @@ const SignUp = () => {
                 navigate("/");
             } catch (error) {
                 console.log(error);
+                alert(error.response.data.message);
                 formik.setSubmitting(false);
             }
         },
     });
 
     React.useEffect(() => {
+        const token = localStorage.getItem("token");
+        if (token) {
+            navigate("/");
+        }
         const saved = JSON.parse(localStorage.getItem("signup_vals"));
         if (saved) {
             formik.setValues(saved);

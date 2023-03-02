@@ -11,18 +11,44 @@ import Typography from "@mui/material/Typography";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { Link as Rlink } from "react-router-dom";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const theme = createTheme();
 
 const SignIn = () => {
-    const handleSubmit = (event) => {
+    const navigate = useNavigate();
+    const handleSubmit = async (event) => {
         event.preventDefault();
-        const data = new FormData(event.currentTarget);
-        console.log({
-            email: data.get("email"),
-            password: data.get("password"),
-        });
+        try {
+            const config = {
+                headers: { "Content-Type": "application/json" },
+            };
+
+            const formData = new FormData(event.currentTarget);
+            const { data } = await axios.post(
+                `https://dummyjson.com/auth/login`,
+                {
+                    username: formData.get("email"),
+                    password: formData.get("password"),
+                },
+                config
+            );
+            console.log(data);
+            localStorage.setItem("user", JSON.stringify(data));
+            localStorage.setItem("token", data.token);
+            navigate("/");
+        } catch (error) {
+            alert(error.response.data.message);
+        }
     };
+
+    React.useEffect(() => {
+        const token = localStorage.getItem("token");
+        if (token) {
+            navigate("/");
+        }
+    }, []);
 
     return (
         <ThemeProvider theme={theme}>
