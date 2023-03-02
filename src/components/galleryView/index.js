@@ -1,4 +1,5 @@
 import React from "react";
+import GalleryDetails from "../galleryDetails";
 import Grid from "@mui/material/Grid";
 import Paper from "@mui/material/Paper";
 import MenuItem from "@mui/material/MenuItem";
@@ -8,7 +9,16 @@ import axios from "axios";
 import "./index.css";
 
 const GalleryView = ({ tab }) => {
+    const [showGalleryDetails, setShowGalleryDetails] = React.useState(false);
+    const [selectedGallery, setSelectedGallery] = React.useState([]);
     const [gallery, setGallery] = React.useState([]);
+
+    const handleGalleryDetails = (e, ind) => {
+        setShowGalleryDetails((prev) => !prev);
+        if (ind !== undefined) {
+            setSelectedGallery(gallery[ind]);
+        }
+    };
 
     const getImages = async () => {
         const config = {
@@ -134,7 +144,16 @@ const GalleryView = ({ tab }) => {
                                                 <MenuList>
                                                     <MenuItem>Edit</MenuItem>
                                                     <MenuItem>Delete</MenuItem>
-                                                    <MenuItem>Details</MenuItem>
+                                                    <MenuItem
+                                                        onClick={(e) =>
+                                                            handleGalleryDetails(
+                                                                e,
+                                                                ind
+                                                            )
+                                                        }
+                                                    >
+                                                        Details
+                                                    </MenuItem>
                                                 </MenuList>
                                             </Paper>
                                         </Stack>
@@ -149,6 +168,12 @@ const GalleryView = ({ tab }) => {
                     )}
                 </Grid>
             </Grid>
+            <GalleryDetails
+                tab={tab}
+                selectedGallery={selectedGallery}
+                showGalleryDetails={showGalleryDetails}
+                handleGalleryDetails={handleGalleryDetails}
+            />
         </Grid>
     );
 };
