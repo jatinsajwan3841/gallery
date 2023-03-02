@@ -26,7 +26,7 @@ const GalleryDetails = ({
                 <DialogTitle id="scroll-dialog-title">
                     Gallery Details
                 </DialogTitle>
-                <DialogContent dividers={scroll === "paper"}>
+                <DialogContent dividers={true}>
                     <DialogContentText
                         id="scroll-dialog-description"
                         tabIndex={-1}
