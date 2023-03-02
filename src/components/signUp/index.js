@@ -9,21 +9,13 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import { Link as Rlink } from "react-router-dom";
+import { Link as Rlink, useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import axios from "axios";
 
 const SignUp = () => {
-    /*const handleSubmit = (event) => {
-        event.preventDefault();
-        const data = new FormData(event.currentTarget);
-        console.log({
-            email: data.get("email"),
-            password: data.get("password"),
-        });
-    };*/
-
+    const navigate = useNavigate();
     const phoneRegExp =
         /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
 
@@ -42,25 +34,19 @@ const SignUp = () => {
             .required("User name is required")
             .test(
                 "Unique username",
-                "Username already in use", // <- key, message
-                function (value) {
-                    return new Promise((resolve, reject) => {
-                        axios
-                            .get(
-                                `http://localhost:8003/api/u/user/${value}/available`
-                            )
-                            .then((res) => {
-                                resolve(true);
-                            })
-                            .catch((error) => {
-                                if (
-                                    error.response.data.content ===
-                                    "The username has already been taken."
-                                ) {
-                                    resolve(false);
-                                }
-                            });
-                    });
+                "Username already in use",
+                async function validateUserName(value) {
+                    try {
+                        const response = await axios.get(
+                            `https://dummyjson.com/users/search?q=${value}`
+                        );
+                        //console.log(response);
+                        if (response.data.total > 0) return false; // or true as you see fit
+                        return true;
+                    } catch (error) {
+                        console.log(error);
+                        return false;
+                    }
                 }
             ),
         email: yup
@@ -69,25 +55,19 @@ const SignUp = () => {
             .required("Email is required")
             .test(
                 "Unique Email",
-                "Email already in use", // <- key, message
-                function (value) {
-                    return new Promise((resolve, reject) => {
-                        axios
-                            .get(
-                                `http://localhost:8003/api/u/user/${value}/available`
-                            )
-                            .then((res) => {
-                                resolve(true);
-                            })
-                            .catch((error) => {
-                                if (
-                                    error.response.data.content ===
-                                    "The email has already been taken."
-                                ) {
-                                    resolve(false);
-                                }
-                            });
-                    });
+                "Email already in use",
+                async function validateEmail(value) {
+                    try {
+                        const response = await axios.get(
+                            `https://dummyjson.com/users/search?q=${value}`
+                        );
+                        //console.log(response);
+                        if (response.data.total > 0) return false; // or true as you see fit
+                        return true;
+                    } catch (error) {
+                        console.log(error);
+                        return false;
+                    }
                 }
             ),
         password: yup
@@ -102,13 +82,51 @@ const SignUp = () => {
             .max(10, "too long"),
     });
 
+    const blankInitialValues = {
+        firstName: "",
+        lastName: "",
+        username: "",
+        email: "",
+        password: "",
+        phone: "",
+    };
+
     const formik = useFormik({
-        initialValues: {},
+        initialValues: blankInitialValues,
         validationSchema: validationSchema,
-        onSubmit: (values) => {
-            alert(JSON.stringify(values, null, 2));
+        onSubmit: async (values) => {
+            console.log(values);
+            try {
+                const config = {
+                    headers: { "Content-Type": "application/json" },
+                };
+                const formData = JSON.stringify(values);
+                const { data } = await axios.post(
+                    `https://dummyjson.com/users/add`,
+                    formData,
+                    config
+                );
+                console.log(data);
+                localStorage.clear("signup_vals");
+                navigate("/");
+            } catch (error) {
+                console.log(error);
+                formik.setSubmitting(false);
+            }
         },
     });
+
+    React.useEffect(() => {
+        const saved = JSON.parse(localStorage.getItem("signup_vals"));
+        if (saved) {
+            formik.setValues(saved);
+        }
+    }, []);
+
+    React.useEffect(() => {
+        if (formik.values !== blankInitialValues)
+            localStorage.setItem("signup_vals", JSON.stringify(formik.values));
+    }, [formik.values]);
 
     return (
         <Container component="main" maxWidth="xs">
@@ -184,15 +202,9 @@ const SignUp = () => {
                                 name="username"
                                 autoComplete="username"
                                 value={formik.values.username}
-                                onBlur={formik.handleChange}
-                                error={
-                                    formik.touched.username &&
-                                    formik.errors.username
-                                }
-                                helperText={
-                                    formik.touched.username &&
-                                    formik.errors.username
-                                }
+                                onChange={formik.handleChange}
+                                error={formik.errors.username}
+                                helperText={formik.errors.username}
                             />
                         </Grid>
                         <Grid item xs={12}>
@@ -205,13 +217,9 @@ const SignUp = () => {
                                 name="email"
                                 autoComplete="email"
                                 value={formik.values.email}
-                                onBlur={formik.handleChange}
-                                error={
-                                    formik.touched.email && formik.errors.email
-                                }
-                                helperText={
-                                    formik.touched.email && formik.errors.email
-                                }
+                                onChange={formik.handleChange}
+                                error={formik.errors.email}
+                                helperText={formik.errors.email}
                             />
                         </Grid>
                         <Grid item xs={12}>
