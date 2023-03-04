@@ -14,7 +14,7 @@ import { useFormik } from "formik";
 import * as yup from "yup";
 import axios from "axios";
 
-const SignUp = () => {
+const SignUp = ({ handleLoading }) => {
     const navigate = useNavigate();
     const phoneRegExp =
         /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
@@ -96,6 +96,7 @@ const SignUp = () => {
         validationSchema: validationSchema,
         onSubmit: async (values) => {
             console.log(values);
+            handleLoading();
             try {
                 const config = {
                     headers: { "Content-Type": "application/json" },
@@ -107,11 +108,13 @@ const SignUp = () => {
                     config
                 );
                 console.log(data);
+                handleLoading();
                 localStorage.clear("signup_vals");
                 navigate("/");
             } catch (error) {
                 console.log(error);
                 alert(error.response.data.message);
+                handleLoading();
                 formik.setSubmitting(false);
             }
         },

@@ -16,10 +16,11 @@ import { useNavigate } from "react-router-dom";
 
 const theme = createTheme();
 
-const SignIn = () => {
+const SignIn = ({ handleLoading }) => {
     const navigate = useNavigate();
     const handleSubmit = async (event) => {
         event.preventDefault();
+        handleLoading();
         try {
             const config = {
                 headers: { "Content-Type": "application/json" },
@@ -35,11 +36,13 @@ const SignIn = () => {
                 config
             );
             console.log(data);
+            handleLoading();
             localStorage.setItem("user", JSON.stringify(data));
             localStorage.setItem("token", data.token);
             navigate("/");
         } catch (error) {
             alert(error.response.data.message);
+            handleLoading();
         }
     };
 

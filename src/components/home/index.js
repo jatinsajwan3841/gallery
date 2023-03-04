@@ -45,7 +45,7 @@ function a11yProps(index) {
     };
 }
 
-const Home = () => {
+const Home = ({ handleLoading }) => {
     const navigate = useNavigate();
     const theme = useTheme();
     const [value, setValue] = React.useState(0);
@@ -87,10 +87,10 @@ const Home = () => {
                 onChangeIndex={handleChangeIndex}
             >
                 <TabPanel value={value} index={0} dir={theme.direction}>
-                    <GalleryView tab="Image" />
+                    <GalleryView handleLoading={handleLoading} tab="Image" />
                 </TabPanel>
                 <TabPanel value={value} index={1} dir={theme.direction}>
-                    <GalleryView tab="Video" />
+                    <GalleryView handleLoading={handleLoading} tab="Video" />
                 </TabPanel>
                 <TabPanel value={value} index={2} dir={theme.direction}>
                     User Profile

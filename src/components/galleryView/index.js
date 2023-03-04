@@ -9,7 +9,7 @@ import axios from "axios";
 import "./index.css";
 import Slider from "../slider";
 
-const GalleryView = ({ tab }) => {
+const GalleryView = ({ tab, handleLoading }) => {
     const [showGalleryDetails, setShowGalleryDetails] = React.useState(false);
     const [showMedia, setShowMedia] = React.useState(false);
     const [selectedGallery, setSelectedGallery] = React.useState([]);
@@ -54,6 +54,7 @@ const GalleryView = ({ tab }) => {
     };
 
     const getImages = async () => {
+        handleLoading();
         const config = {
             headers: {
                 "Content-Type": "application/json",
@@ -68,10 +69,12 @@ const GalleryView = ({ tab }) => {
         data.push(images.data.photos.slice(0, 10));
         data.push(images.data.photos.slice(10, 20));
         data.push(images.data.photos.slice(20, 30));
+        handleLoading();
         setGallery(data);
     };
 
     const getVidoes = async () => {
+        handleLoading();
         const config = {
             headers: {
                 "Content-Type": "application/json",
@@ -86,6 +89,7 @@ const GalleryView = ({ tab }) => {
         data.push(videos.data.videos.slice(0, 10));
         data.push(videos.data.videos.slice(10, 20));
         data.push(videos.data.videos.slice(20, 30));
+        handleLoading();
         setGallery(data);
     };
     React.useEffect(() => {
@@ -96,146 +100,141 @@ const GalleryView = ({ tab }) => {
         }
     }, []);
     return (
-        <>
-            <Grid sx={{ flexGrow: 1, mt: "40px" }} container spacing={2}>
-                <Grid item xs={12}>
-                    <Grid container justifyContent="left" spacing={12}>
-                        {gallery.length > 0 ? (
-                            gallery.map((value, ind) => (
-                                <Grid key={ind} item>
-                                    <Paper
-                                        sx={{
-                                            height: 300,
-                                            width: 300,
-                                        }}
+        <Grid sx={{ flexGrow: 1, mt: "40px" }} container spacing={2}>
+            <Grid item xs={12}>
+                <Grid container justifyContent="left" spacing={12}>
+                    {gallery.length > 0 ? (
+                        gallery.map((value, ind) => (
+                            <Grid key={ind} item>
+                                <Paper
+                                    sx={{
+                                        height: 300,
+                                        width: 300,
+                                    }}
+                                >
+                                    <Grid
+                                        container
+                                        direction="row"
+                                        className="gallery-holder"
                                     >
-                                        <Grid
-                                            container
-                                            direction="row"
-                                            className="gallery-holder"
-                                        >
-                                            {value &&
-                                                value.map((val, ind) => {
-                                                    return (
-                                                        ind < 4 && (
-                                                            <div
-                                                                className="gallery-images"
-                                                                key={ind}
-                                                            >
-                                                                {tab ===
-                                                                "Image" ? (
-                                                                    <img
+                                        {value &&
+                                            value.map((val, ind) => {
+                                                return (
+                                                    ind < 4 && (
+                                                        <div
+                                                            className="gallery-images"
+                                                            key={ind}
+                                                        >
+                                                            {tab === "Image" ? (
+                                                                <img
+                                                                    src={
+                                                                        val.src
+                                                                            .medium
+                                                                    }
+                                                                    width="149"
+                                                                    height="149"
+                                                                    loading="lazy"
+                                                                    style={{
+                                                                        objectFit:
+                                                                            "cover",
+                                                                    }}
+                                                                />
+                                                            ) : (
+                                                                <video
+                                                                    width="149"
+                                                                    height="149"
+                                                                    controls
+                                                                    style={{
+                                                                        objectFit:
+                                                                            "cover",
+                                                                    }}
+                                                                >
+                                                                    <source
                                                                         src={
                                                                             val
-                                                                                .src
-                                                                                .medium
+                                                                                .video_files[1]
+                                                                                .link
                                                                         }
-                                                                        width="149"
-                                                                        height="149"
-                                                                        loading="lazy"
-                                                                        style={{
-                                                                            objectFit:
-                                                                                "cover",
-                                                                        }}
+                                                                        type="video/mp4"
                                                                     />
-                                                                ) : (
-                                                                    <video
-                                                                        width="149"
-                                                                        height="149"
-                                                                        controls
-                                                                        style={{
-                                                                            objectFit:
-                                                                                "cover",
-                                                                        }}
-                                                                    >
-                                                                        <source
-                                                                            src={
-                                                                                val
-                                                                                    .video_files[1]
-                                                                                    .link
-                                                                            }
-                                                                            type="video/mp4"
-                                                                        />
-                                                                    </video>
+                                                                </video>
+                                                            )}
+                                                            {value.length > 4 &&
+                                                                ind > 2 && (
+                                                                    <span className="gallery-number">
+                                                                        +
+                                                                        {value.length -
+                                                                            4}
+                                                                    </span>
                                                                 )}
-                                                                {value.length >
-                                                                    4 &&
-                                                                    ind > 2 && (
-                                                                        <span className="gallery-number">
-                                                                            +
-                                                                            {value.length -
-                                                                                4}
-                                                                        </span>
-                                                                    )}
-                                                            </div>
-                                                        )
-                                                    );
-                                                })}
-                                            <Stack
-                                                direction="row"
-                                                className="gallery-options"
-                                            >
-                                                <Paper>
-                                                    <MenuList>
-                                                        <MenuItem
-                                                            onClick={(e) =>
-                                                                handleGalleryDetails(
-                                                                    e,
-                                                                    ind
-                                                                )
-                                                            }
-                                                        >
-                                                            Edit
-                                                        </MenuItem>
-                                                        <MenuItem
-                                                            onClick={(e) =>
-                                                                handleGalleryDelete(
-                                                                    e,
-                                                                    ind
-                                                                )
-                                                            }
-                                                        >
-                                                            Delete
-                                                        </MenuItem>
-                                                        <MenuItem
-                                                            onClick={(e) =>
-                                                                handleShowMedia(
-                                                                    e,
-                                                                    ind
-                                                                )
-                                                            }
-                                                        >
-                                                            Details
-                                                        </MenuItem>
-                                                    </MenuList>
-                                                </Paper>
-                                            </Stack>
-                                        </Grid>
-                                    </Paper>
-                                </Grid>
-                            ))
-                        ) : (
-                            <Grid item>
-                                <span className="empty">No {tab} found</span>
+                                                        </div>
+                                                    )
+                                                );
+                                            })}
+                                        <Stack
+                                            direction="row"
+                                            className="gallery-options"
+                                        >
+                                            <Paper>
+                                                <MenuList>
+                                                    <MenuItem
+                                                        onClick={(e) =>
+                                                            handleGalleryDetails(
+                                                                e,
+                                                                ind
+                                                            )
+                                                        }
+                                                    >
+                                                        Edit
+                                                    </MenuItem>
+                                                    <MenuItem
+                                                        onClick={(e) =>
+                                                            handleGalleryDelete(
+                                                                e,
+                                                                ind
+                                                            )
+                                                        }
+                                                    >
+                                                        Delete
+                                                    </MenuItem>
+                                                    <MenuItem
+                                                        onClick={(e) =>
+                                                            handleShowMedia(
+                                                                e,
+                                                                ind
+                                                            )
+                                                        }
+                                                    >
+                                                        Details
+                                                    </MenuItem>
+                                                </MenuList>
+                                            </Paper>
+                                        </Stack>
+                                    </Grid>
+                                </Paper>
                             </Grid>
-                        )}
-                    </Grid>
+                        ))
+                    ) : (
+                        <Grid item>
+                            <span className="empty">No {tab} found</span>
+                        </Grid>
+                    )}
                 </Grid>
-                <GalleryDetails
-                    tab={tab}
-                    selectedGallery={selectedGallery}
-                    showGalleryDetails={showGalleryDetails}
-                    handleGalleryDetails={handleGalleryDetails}
-                />
-                <Slider
-                    tab={tab}
-                    media={selectedGallery}
-                    showMedia={showMedia}
-                    handleShowMedia={handleShowMedia}
-                    handleMediaDelete={handleMediaDelete}
-                />
             </Grid>
-        </>
+            <GalleryDetails
+                tab={tab}
+                selectedGallery={selectedGallery}
+                showGalleryDetails={showGalleryDetails}
+                handleGalleryDetails={handleGalleryDetails}
+            />
+            <Slider
+                tab={tab}
+                media={selectedGallery}
+                showMedia={showMedia}
+                handleShowMedia={handleShowMedia}
+                handleMediaDelete={handleMediaDelete}
+            />
+        </Grid>
     );
 };
 
